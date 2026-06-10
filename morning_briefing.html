@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Good morning, Riyanshi</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #f4f0fb;
+    color: #2a1f3d;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    padding: 20px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #e2d9f3;
+    background: #f4f0fb;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .logo-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #9b87f5;
+  }
+  .logo-text { font-size: 13px; font-weight: 600; letter-spacing: 0.02em; color: #2a1f3d; }
+  .topbar-right { font-size: 12px; color: #888; }
+
+  /* ── MAIN ── */
+  main {
+    flex: 1;
+    max-width: 720px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 56px 24px 80px;
+  }
+
+  /* ── GREETING ── */
+  .greeting {
+    margin-bottom: 40px;
+  }
+  .greeting-time {
+    font-size: 12px; font-weight: 500; color: #999;
+    text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px;
+  }
+  .greeting-name {
+    font-size: 32px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1;
+  }
+  .greeting-sub {
+    font-size: 15px; color: #666; margin-top: 8px;
+    font-weight: 400;
+  }
+
+  /* ── RUN BUTTON ── */
+  .run-area { margin-bottom: 40px; }
+  .run-btn {
+    background: #9b87f5; color: #fff;
+    border: none; border-radius: 10px;
+    padding: 13px 24px; font-size: 14px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: all .15s;
+  }
+  .run-btn:hover { background: #8370e8; transform: translateY(-1px); }
+  .run-btn:disabled { background: #c9bfee; cursor: default; transform: none; }
+  .status-line {
+    font-size: 12px; color: #999; margin-top: 10px;
+    min-height: 18px; transition: opacity .3s;
+  }
+
+  /* ── CARDS GRID ── */
+  .cards { display: flex; flex-direction: column; gap: 12px; }
+
+  .card {
+    background: #fff;
+    border: 1px solid #e2d9f3;
+    border-radius: 14px;
+    padding: 20px 24px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity .35s ease, transform .35s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .card.loading::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.6) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.2s infinite;
+    border-radius: 14px;
+  }
+  @keyframes shimmer {
+    from { background-position: 200% 0; }
+    to   { background-position: -200% 0; }
+  }
+
+  .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .card-source {
+    display: flex; align-items: center; gap: 7px;
+  }
+  .source-icon {
+    width: 22px; height: 22px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; flex-shrink: 0;
+  }
+  .source-label {
+    font-size: 11px; font-weight: 600; color: #999;
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .card-badge {
+    font-size: 10px; font-weight: 700; padding: 3px 9px;
+    border-radius: 100px; text-transform: uppercase; letter-spacing: 0.06em;
+  }
+
+  /* ── CARD CONTENTS ── */
+  .card-title {
+    font-size: 15px; font-weight: 600; line-height: 1.4; margin-bottom: 4px;
+  }
+  .card-body {
+    font-size: 13px; color: #666; line-height: 1.6;
+  }
+  .card-body strong { color: #1a1a1a; font-weight: 600; }
+
+  /* event list */
+  .event-list { display: flex; flex-direction: column; gap: 8px; }
+  .event-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 14px; background: #f7f3ff; border-radius: 8px;
+  }
+  .event-time {
+    font-size: 11px; font-weight: 700; color: #999;
+    white-space: nowrap; padding-top: 1px; min-width: 48px;
+  }
+  .event-name { font-size: 13px; font-weight: 500; }
+  .event-meta { font-size: 12px; color: #999; margin-top: 1px; }
+
+  /* weather */
+  .weather-row {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .weather-main { display: flex; align-items: center; gap: 14px; }
+  .weather-temp { font-size: 40px; font-weight: 300; letter-spacing: -0.03em; }
+  .weather-desc { font-size: 13px; color: #666; }
+  .weather-detail { font-size: 12px; color: #999; margin-top: 2px; }
+  .weather-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .weather-chip {
+    background: #ede8fa; border-radius: 8px; padding: 8px 14px;
+    font-size: 12px; font-weight: 500; color: #555;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+  }
+  .weather-chip span { font-size: 10px; color: #999; }
+
+  /* email */
+  .email-list { display: flex; flex-direction: column; gap: 6px; }
+  .email-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; background: #f9f8f5; border-radius: 8px;
+  }
+  .email-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .email-from { font-size: 12px; font-weight: 600; min-width: 90px; }
+  .email-subject { font-size: 12px; color: #666; flex: 1; }
+  .email-time { font-size: 11px; color: #aaa; white-space: nowrap; }
+
+  /* slack */
+  .slack-list { display: flex; flex-direction: column; gap: 6px; }
+  .slack-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 9px 12px; background: #f9f8f5; border-radius: 8px;
+  }
+  .slack-channel {
+    font-size: 11px; font-weight: 700; color: #999; min-width: 80px; padding-top: 1px;
+  }
+  .slack-msg { font-size: 12px; color: #555; flex: 1; line-height: 1.4; }
+  .slack-count {
+    font-size: 10px; font-weight: 700; background: #ede8fa;
+    border-radius: 100px; padding: 2px 7px; white-space: nowrap;
+    align-self: flex-start;
+  }
+
+  /* notion */
+  .notion-list { display: flex; flex-direction: column; gap: 6px; }
+  .notion-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; background: #f9f8f5; border-radius: 8px;
+  }
+  .notion-status {
+    font-size: 10px; font-weight: 700; padding: 2px 8px;
+    border-radius: 4px; white-space: nowrap; text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .ns-todo  { background: #ede8fa; color: #7c6fa0; }
+  .ns-doing { background: #fff3cd; color: #9a6c00; }
+  .ns-done  { background: #d4edda; color: #276742; }
+  .notion-title { font-size: 13px; font-weight: 500; }
+
+  /* ── SKELETON lines ── */
+  .skel { height: 12px; background: #e8e0f5; border-radius: 4px; margin-bottom: 8px; }
+  .skel.short { width: 40%; }
+  .skel.med   { width: 65%; }
+  .skel.full  { width: 100%; }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 20px 36px;
+    border-top: 1px solid #e2d9f3;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  footer p { font-size: 12px; color: #bbb; }
+  .footer-link { font-size: 12px; color: #999; text-decoration: none; }
+  .footer-link:hover { color: #2a1f3d; }
+
+  @media (max-width: 600px) {
+    main { padding: 36px 16px 60px; }
+    .topbar { padding: 16px 20px; }
+    .greeting-name { font-size: 26px; }
+    .weather-temp { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo-dot"></div>
+    <span class="logo-text">morning brief</span>
+  </div>
+  <div class="topbar-right" id="topbar-time"></div>
+</div>
+
+<main>
+  <div class="greeting">
+    <div class="greeting-time" id="greeting-time"></div>
+    <div class="greeting-name">Good morning, Riyanshi.</div>
+    <div class="greeting-sub">Here's what's waiting for you today.</div>
+  </div>
+
+  <div class="run-area">
+    <button class="run-btn" id="run-btn" onclick="runBrief()">
+      <span id="btn-icon">→</span>
+      <span id="btn-text">Pull my brief</span>
+    </button>
+    <div class="status-line" id="status-line"></div>
+  </div>
+
+  <div class="cards" id="cards"></div>
+</main>
+
+<footer>
+  <p>Connecting via MCP · All data stays local</p>
+  <a href="mailto:riyanshi.shah@gmail.com" class="footer-link">riyanshi.shah@gmail.com</a>
+</footer>
+
+<script>
+// ── Time display ──
+function updateTime() {
+  const now = new Date();
+  const t = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  const d = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  document.getElementById('topbar-time').textContent = t;
+  document.getElementById('greeting-time').textContent = d;
+}
+updateTime();
+setInterval(updateTime, 10000);
+
+// ── MCP card definitions ──
+const mcps = [
+  {
+    id: 'calendar',
+    source: '@google/calendar',
+    icon: '📅',
+    iconBg: '#e8f4ff',
+    badge: 'Calendar',
+    badgeBg: '#e8f4ff',
+    badgeColor: '#1a73e8',
+    delay: 0,
+    duration: 900,
+    render: () => `
+      <div class="card-title">4 meetings today</div>
+      <div class="card-body" style="margin-bottom:12px;">First one starts in <strong>47 minutes.</strong></div>
+      <div class="event-list">
+        <div class="event-item">
+          <div class="event-time">9:30</div>
+          <div>
+            <div class="event-name">Standup</div>
+            <div class="event-meta">Engineering · 15 min</div>
+          </div>
+        </div>
+        <div class="event-item">
+          <div class="event-time">11:00</div>
+          <div>
+            <div class="event-name">Product Review</div>
+            <div class="event-meta">Full team · Zoom · 1 hr</div>
+          </div>
+        </div>
+        <div class="event-item">
+          <div class="event-time">1:00</div>
+          <div>
+            <div class="event-name">Partner sync — AI features</div>
+            <div class="event-meta">Confirmed · MoM Riyanshi</div>
+          </div>
+        </div>
+        <div class="event-item">
+          <div class="event-time">3:30</div>
+          <div>
+            <div class="event-name">1:1 w/ Manager</div>
+            <div class="event-meta">30 min · no agenda yet</div>
+          </div>
+        </div>
+      </div>
+    `
+  },
+  {
+    id: 'weather',
+    source: '@openmeteo/weather',
+    icon: '🌤',
+    iconBg: '#fff8e1',
+    badge: 'Weather',
+    badgeBg: '#fff8e1',
+    badgeColor: '#f59e0b',
+    delay: 700,
+    duration: 600,
+    render: () => `
+      <div class="weather-row">
+        <div class="weather-main">
+          <div class="weather-temp">58°</div>
+          <div>
+            <div class="card-title">Partly cloudy</div>
+            <div class="weather-desc">Chicago, IL</div>
+            <div class="weather-detail">Rain likely 4–6 PM · bring a jacket</div>
+          </div>
+        </div>
+        <div class="weather-chips">
+          <div class="weather-chip">62° <span>High</span></div>
+          <div class="weather-chip">51° <span>Low</span></div>
+          <div class="weather-chip">30% <span>Rain</span></div>
+        </div>
+      </div>
+    `
+  },
+  {
+    id: 'gmail',
+    source: '@google/gmail',
+    icon: '✉️',
+    iconBg: '#fce8e6',
+    badge: '3 need you',
+    badgeBg: '#fce8e6',
+    badgeColor: '#d93025',
+    delay: 1300,
+    duration: 800,
+    render: () => `
+      <div class="card-title">9 unread · 3 need a reply today</div>
+      <div class="email-list" style="margin-top:12px;">
+        <div class="email-item">
+          <div class="email-dot" style="background:#d93025"></div>
+          <div class="email-from">Alex T.</div>
+          <div class="email-subject">Contract terms — need sign-off</div>
+          <div class="email-time">8:02 AM</div>
+        </div>
+        <div class="email-item">
+          <div class="email-dot" style="background:#d93025"></div>
+          <div class="email-from">Sarah K.</div>
+          <div class="email-subject">Design feedback on v2 screens</div>
+          <div class="email-time">7:44 AM</div>
+        </div>
+        <div class="email-item">
+          <div class="email-dot" style="background:#d93025"></div>
+          <div class="email-from">Jamie R.</div>
+          <div class="email-subject">Next steps — following up on our call</div>
+          <div class="email-time">6:31 AM</div>
+        </div>
+        <div class="email-item">
+          <div class="email-dot" style="background:#ccc"></div>
+          <div class="email-from">GitHub</div>
+          <div class="email-subject">2 PRs waiting on your review</div>
+          <div class="email-time">11:55 PM</div>
+        </div>
+      </div>
+    `
+  },
+  {
+    id: 'slack',
+    source: '@slack/messaging',
+    icon: '💬',
+    iconBg: '#f3eeff',
+    badge: 'Slack',
+    badgeBg: '#f3eeff',
+    badgeColor: '#7c3aed',
+    delay: 2000,
+    duration: 700,
+    render: () => `
+      <div class="card-title">12 mentions since yesterday</div>
+      <div class="slack-list" style="margin-top:12px;">
+        <div class="slack-item">
+          <div class="slack-channel">#ai-features</div>
+          <div class="slack-msg">MCP integration spec is ready for review — tagging you @riyanshi</div>
+          <div class="slack-count">4 msgs</div>
+        </div>
+        <div class="slack-item">
+          <div class="slack-channel">#product</div>
+          <div class="slack-msg">Can you share the AI product brief before the 1pm call?</div>
+          <div class="slack-count">2 msgs</div>
+        </div>
+        <div class="slack-item">
+          <div class="slack-channel">#general</div>
+          <div class="slack-msg">Sprint retro notes posted — a few action items for you</div>
+          <div class="slack-count">6 msgs</div>
+        </div>
+      </div>
+    `
+  },
+  {
+    id: 'notion',
+    source: '@notion/workspace',
+    icon: '📝',
+    iconBg: '#f0f0ee',
+    badge: 'Notion',
+    badgeBg: '#f0f0ee',
+    badgeColor: '#555',
+    delay: 2700,
+    duration: 600,
+    render: () => `
+      <div class="card-title">3 tasks due today</div>
+      <div class="notion-list" style="margin-top:12px;">
+        <div class="notion-item">
+          <div class="notion-status ns-doing">In progress</div>
+          <div class="notion-title">AI features — partner brief v2</div>
+        </div>
+        <div class="notion-item">
+          <div class="notion-status ns-todo">To do</div>
+          <div class="notion-title">Review MCP spec with eng team</div>
+        </div>
+        <div class="notion-item">
+          <div class="notion-status ns-todo">To do</div>
+          <div class="notion-title">Prep 1:1 agenda for manager</div>
+        </div>
+        <div class="notion-item">
+          <div class="notion-status ns-done">Done</div>
+          <div class="notion-title">Send partner intro email</div>
+        </div>
+      </div>
+    `
+  },
+];
+
+// ── Runner ──
+let hasRun = false;
+
+async function runBrief() {
+  if (hasRun) return;
+  hasRun = true;
+
+  const btn = document.getElementById('run-btn');
+  const btnText = document.getElementById('btn-text');
+  const btnIcon = document.getElementById('btn-icon');
+  const statusLine = document.getElementById('status-line');
+  const cardsEl = document.getElementById('cards');
+
+  btn.disabled = true;
+  btnIcon.textContent = '⟳';
+  btnText.textContent = 'Connecting…';
+
+  const statusMessages = [
+    'Connecting to @google/calendar…',
+    'Fetching @openmeteo/weather…',
+    'Reading @google/gmail…',
+    'Checking @slack/messaging…',
+    'Loading @notion/workspace…'
+  ];
+
+  // Pre-render all cards as placeholders
+  mcps.forEach((mcp, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = `card-${mcp.id}`;
+    card.innerHTML = buildCardShell(mcp, true);
+    cardsEl.appendChild(card);
+    setTimeout(() => card.classList.add('visible'), 50 * i);
+  });
+
+  // Resolve each card
+  mcps.forEach((mcp, i) => {
+    setTimeout(() => {
+      statusLine.textContent = statusMessages[i] || '';
+      const card = document.getElementById(`card-${mcp.id}`);
+      card.classList.add('loading');
+
+      setTimeout(() => {
+        card.classList.remove('loading');
+        card.innerHTML = buildCardShell(mcp, false);
+        if (i === mcps.length - 1) {
+          statusLine.textContent = '';
+          btnIcon.textContent = '✓';
+          btnText.textContent = 'Brief ready';
+        }
+      }, mcp.duration);
+
+    }, mcp.delay);
+  });
+}
+
+function buildCardShell(mcp, skeleton) {
+  const badgeHtml = mcp.badge
+    ? `<span class="card-badge" style="background:${mcp.badgeBg};color:${mcp.badgeColor};">${mcp.badge}</span>`
+    : '';
+
+  const header = `
+    <div class="card-header">
+      <div class="card-source">
+        <div class="source-icon" style="background:${mcp.iconBg};">${mcp.icon}</div>
+        <span class="source-label">${mcp.source}</span>
+      </div>
+      ${badgeHtml}
+    </div>
+  `;
+
+  if (skeleton) {
+    return header + `
+      <div class="skel med"></div>
+      <div class="skel full"></div>
+      <div class="skel short"></div>
+    `;
+  }
+
+  return header + mcp.render();
+}
+</script>
+</body>
+</html>
